@@ -103,12 +103,12 @@ public class LanguageModel {
         String window = initialText.substring(initialText.length() - windowLength);
         String generatedText = window;
 
-        while (window.length() != textLength) { // we stop the process when reaching the desired text length
+       for (int i = 0; i < textLength; i++) {
             List probs = CharDataMap.get(window);
 
             if (probs != null) {
                 char character = getRandomChar(probs);
-                generatedText += character;
+                generatedText = generatedText + character;
                 window = generatedText.substring(generatedText.length() - windowLength);
             } 
             
@@ -130,20 +130,12 @@ public class LanguageModel {
 	}
 
     public static void main(String[] args) {
-        int windowLength = Integer.parseInt(args[0]);
-        String initialText = args[1];
-        int generatedTextLength = Integer.parseInt(args[2]);
-        Boolean randomGeneration = args[3].equals("random");
-        String fileName = args[4];
-        // Create the LanguageModel object
-        LanguageModel lm;
-        if (randomGeneration)
-        lm = new LanguageModel(windowLength);
-        else
-        lm = new LanguageModel(windowLength, 20);
-        // Trains the model, creating the map.
-        lm.train(fileName);
-        // Generates text, and prints it.
-        System.out.println(lm.generate(initialText, generatedTextLength));
+        LanguageModel model = new LanguageModel(3);
+
+        model.train("shakespeareinlove.txt");
+
+        String generatedText = model.generate("initial text", 100);
+
+        System.out.println(generatedText);
     }
 }
