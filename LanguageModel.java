@@ -78,7 +78,7 @@ public class LanguageModel {
 
     // Returns a random character from the given probabilities list.
 	public char getRandomChar(List probs) {
-		double r = Math.random();
+		double r = randomGenerator.nextDouble();
         for (int i = 0; i < probs.getSize(); i++) {
             CharData currentChar = probs.get(i);
             if (r < currentChar.cp) {
@@ -86,7 +86,7 @@ public class LanguageModel {
             }
         }
         return probs.get(probs.getSize() - 1).chr;
-	}
+    }
 
     /**
 	 * Generates a random text, based on the probabilities that were learned during training. 
@@ -96,7 +96,27 @@ public class LanguageModel {
 	 * @return the generated text
 	 */
 	public String generate(String initialText, int textLength) {
-		return "";
+		if (initialText.length() < windowLength) { // initial check
+            return initialText;
+        }
+
+        String window = initialText.substring(initialText.length() - windowLength);
+        String generatedText = window;
+
+        while (window.length() != textLength) { // we stop the process when reaching the desired text length
+            List probs = CharDataMap.get(window);
+
+            if (probs != null) {
+                char character = getRandomChar(probs);
+                generatedText += character;
+                window = generatedText.substring(generatedText.length() - windowLength);
+            } 
+            
+            else {
+                return generatedText;
+            }
+        }
+        return generatedText;
 	}
 
     /** Returns a string representing the map of this language model. */
@@ -109,22 +129,21 @@ public class LanguageModel {
 		return str.toString();
 	}
 
-    // public static void main(String[] args) {
-    //     LanguageModel languageModel = new LanguageModel(3);
-    //     List newList = new List();
-    //     String committee = "committee_";
-    //     for (int i = 0; i < committee.length(); i++) {
-    //         newList.addFirst(committee.charAt(i));
-    //     }
-    //     System.out.println(newList);
-    //     languageModel.calculateProbabilities(newList);
-    //     System.out.println(newList);
-    //     int count = 0;
-    //     int N = 10000;
-    //     for (int i = 0; i < N; i++) {
-    //         char c = languageModel.getRandomChar(newList);
-    //         if (c == '_') count++;
-    //     }
-    //     System.out.println((double) count / N);
-    // }
+    public static void main(String[] args) {
+        int windowLength = Integer.parseInt(args[0]);
+        String initialText = args[1];
+        int generatedTextLength = Integer.parseInt(args[2]);
+        Boolean randomGeneration = args[3].equals("random");
+        String fileName = args[4];
+        // Create the LanguageModel object
+        LanguageModel lm;
+        if (randomGeneration)
+        lm = new LanguageModel(windowLength);
+        else
+        lm = new LanguageModel(windowLength, 20);
+        // Trains the model, creating the map.
+        lm.train(fileName);
+        // Generates text, and prints it.
+        System.out.println(lm.generate(initialText, generatedTextLength));
+    }
 }
