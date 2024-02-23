@@ -103,7 +103,7 @@ public class LanguageModel {
         String window = initialText.substring(initialText.length() - windowLength);
         String generatedText = window;
 
-       for (int i = 0; i < textLength; i++) {
+       while (generatedText.length() <= textLength) {
             List probs = CharDataMap.get(window);
 
             if (probs != null) {
@@ -130,12 +130,5 @@ public class LanguageModel {
 	}
 
     public static void main(String[] args) {
-        LanguageModel model = new LanguageModel(3);
-
-        model.train("shakespeareinlove.txt");
-
-        String generatedText = model.generate("initial text", 100);
-
-        System.out.println(generatedText);
     }
 }
