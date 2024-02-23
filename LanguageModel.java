@@ -32,29 +32,47 @@ public class LanguageModel {
 
     /** Builds a language model from the text in the given file (the corpus). */
 	public void train(String fileName) {
-		// Your code goes here
+		String window = "";
+        char c;
+        In in = new In(fileName);
+        for (int i = 0; i < this.windowLength; i++) {
+            window += in.readChar();
+        }
+        while (!in.isEmpty()) {
+            c = in.readChar();
+            List probs = CharDataMap.get(window);
+            if (probs == null) {
+                probs = new List();
+                CharDataMap.put(window, probs);
+            }
+            probs.update(c);
+            window = window.substring(1) + c;
+        }
+        for (List probs : CharDataMap.values()) {
+            calculateProbabilities(probs);
+        }
 	}
 
     // Computes and sets the probabilities (p and cp fields) of all the
 	// characters in the given list. */
-	public List calculateProbabilities(List probs) {				
-        List updatedList = new List();
-        int orgSize = probs.getSize();
-        for (int i = 0; i < orgSize; i++) {
-            updatedList.update(probs.get(i).chr);
+	public void calculateProbabilities(List probs) {				
+        int probsSize = probs.getSize();
+        int numberOfChars = 0;
+
+        for (int i = 0; i < probsSize; i++) {
+            numberOfChars += probs.get(i).count;
         }
-        int numberOfChars = updatedList.getSize();
-        CharData firstChar = updatedList.getFirst();
-        firstChar.p = (double) firstChar.count / orgSize;
+
+        CharData firstChar = probs.getFirst();
+        firstChar.p = (double) firstChar.count / numberOfChars;
         firstChar.cp = firstChar.p; 
         for (int i = 1; i < numberOfChars; i++) {
-            CharData currectChar = updatedList.get(i);
-            CharData prevChar = updatedList.get(i-1);
-            double x = (double) currectChar.count / orgSize;
+            CharData currectChar = probs.get(i);
+            CharData prevChar = probs.get(i-1);
+            double x = (double) currectChar.count / numberOfChars;
             currectChar.p = x;
             currectChar.cp = prevChar.cp + x;
         }
-        return updatedList;
 	}
 
     // Returns a random character from the given probabilities list.
@@ -91,21 +109,21 @@ public class LanguageModel {
 	}
 
     public static void main(String[] args) {
-        LanguageModel languageModel = new LanguageModel(3);
-        List newList = new List();
-        String committee = "committttee_";
-        for (int i = 0; i < committee.length(); i++) {
-            newList.addFirst(committee.charAt(i));
-        }
-        System.out.println(newList);
-        newList = languageModel.calculateProbabilities(newList);
-        System.out.println(newList);
-        int count = 0;
-        int N = 10000;
-        for (int i = 0; i < N; i++) {
-            char c = languageModel.getRandomChar(newList);
-            if (c == 't') count++;
-        }
-        System.out.println((double) count / N);
+        // LanguageModel languageModel = new LanguageModel(3);
+        // List newList = new List();
+        // String committee = "committee_";
+        // for (int i = 0; i < committee.length(); i++) {
+        //     newList.addFirst(committee.charAt(i));
+        // }
+        // System.out.println(newList);
+        // languageModel.calculateProbabilities(newList);
+        // System.out.println(newList);
+        // int count = 0;
+        // int N = 10000;
+        // for (int i = 0; i < N; i++) {
+        //     char c = languageModel.getRandomChar(newList);
+        //     if (c == '_') count++;
+        // }
+        // System.out.println((double) count / N);
     }
 }
