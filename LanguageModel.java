@@ -56,23 +56,23 @@ public class LanguageModel {
     // Computes and sets the probabilities (p and cp fields) of all the
 	// characters in the given list. */
 	public void calculateProbabilities(List probs) {				
-        int probsSize = probs.getSize();
+        int probsSize =	probs.getSize();			
         int numberOfChars = 0;
-
-        for (int i = 0; i < probsSize; i++) {
+        for (int i = 0; i < probsSize ; i++){
             numberOfChars += probs.get(i).count;
         }
-
-        CharData firstChar = probs.getFirst();
-        firstChar.p = (double) firstChar.count / numberOfChars;
-        firstChar.cp = firstChar.p; 
-        for (int j = 1; j < probsSize; j++) {
-            CharData currectChar = probs.get(j);
-            CharData prevChar = probs.get(j-1);
-            double x = (double) currectChar.count / numberOfChars;
-            System.out.println(x);
-            currectChar.p = x;
-            currectChar.cp = prevChar.cp + x;
+        CharData first = probs.getFirst();
+        Double firstProb = (double) first.count / numberOfChars;
+        first.p = firstProb;
+        first.cp = firstProb;
+  
+        CharData prev = first;
+        for (int j = 1 ; j < probsSize ; j++) {
+            CharData current = probs.get(j);
+            double calc = (double) current.count / numberOfChars;
+            current.p = calc;
+            current.cp = prev.cp + calc;
+            prev = current;
         }
 	}
 
@@ -109,22 +109,22 @@ public class LanguageModel {
 		return str.toString();
 	}
 
-    public static void main(String[] args) {
-        LanguageModel languageModel = new LanguageModel(3);
-        List newList = new List();
-        String committee = "committee_";
-        for (int i = 0; i < committee.length(); i++) {
-            newList.addFirst(committee.charAt(i));
-        }
-        System.out.println(newList);
-        languageModel.calculateProbabilities(newList);
-        System.out.println(newList);
-        int count = 0;
-        int N = 10000;
-        for (int i = 0; i < N; i++) {
-            char c = languageModel.getRandomChar(newList);
-            if (c == '_') count++;
-        }
-        System.out.println((double) count / N);
-    }
+    // public static void main(String[] args) {
+    //     LanguageModel languageModel = new LanguageModel(3);
+    //     List newList = new List();
+    //     String committee = "committee_";
+    //     for (int i = 0; i < committee.length(); i++) {
+    //         newList.addFirst(committee.charAt(i));
+    //     }
+    //     System.out.println(newList);
+    //     languageModel.calculateProbabilities(newList);
+    //     System.out.println(newList);
+    //     int count = 0;
+    //     int N = 10000;
+    //     for (int i = 0; i < N; i++) {
+    //         char c = languageModel.getRandomChar(newList);
+    //         if (c == '_') count++;
+    //     }
+    //     System.out.println((double) count / N);
+    // }
 }
