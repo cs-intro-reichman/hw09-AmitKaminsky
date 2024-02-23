@@ -6,13 +6,17 @@
 public class List {
     public static void main(String[] args) {
         List newList = new List();
+        List newList2 = new List();
         String committee = "committee_";
         for (int i = 0; i < committee.length(); i++) {
             newList.addFirst(committee.charAt(i));
         }
-        System.out.println(newList);
-        System.out.println(newList.get(0));
+        for (int i = 0; i < newList.size; i++) {
+            newList2.update(newList.get(i).chr);
+        }
+        System.out.println(newList2);
     }
+
     // Points to the first node in this list
     private Node first;
 
@@ -37,8 +41,7 @@ public class List {
 
     /** GIVE Adds a CharData object with the given character to the beginning of this list. */
     public void addFirst(char chr) {
-        Node newNode = new Node(new CharData(chr));
-        newNode.next = this.first;
+        Node newNode = new Node(new CharData(chr), this.first);
         this.first = newNode;
         this.size++;
     }
