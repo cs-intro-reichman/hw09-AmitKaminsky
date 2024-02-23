@@ -2,7 +2,6 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class LanguageModel {
-
     // The map of this model.
     // Maps windows to lists of charachter data objects.
     HashMap<String, List> CharDataMap;
@@ -38,13 +37,36 @@ public class LanguageModel {
 
     // Computes and sets the probabilities (p and cp fields) of all the
 	// characters in the given list. */
-	public void calculateProbabilities(List probs) {				
-		// Your code goes here
+	public List calculateProbabilities(List probs) {				
+        List updatedList = new List();
+        int orgSize = probs.getSize();
+        for (int i = 0; i < orgSize; i++) {
+            updatedList.update(probs.get(i).chr);
+        }
+        int numberOfChars = updatedList.getSize();
+        CharData firstChar = updatedList.getFirst();
+        firstChar.p = (double) firstChar.count / orgSize;
+        firstChar.cp = firstChar.p; 
+        for (int i = 1; i < numberOfChars; i++) {
+            CharData currectChar = updatedList.get(i);
+            CharData prevChar = updatedList.get(i-1);
+            double x = (double) currectChar.count / orgSize;
+            currectChar.p = x;
+            currectChar.cp = prevChar.cp + x;
+        }
+        return updatedList;
 	}
 
     // Returns a random character from the given probabilities list.
 	public char getRandomChar(List probs) {
-		// Your code goes here
+		double r = Math.random();
+        for (int i = 0; i < probs.getSize(); i++) {
+            CharData currentChar = probs.get(i);
+            if (r < currentChar.cp) {
+                return currentChar.chr;
+            }
+        }
+        return probs.get(probs.getSize() - 1).chr;
 	}
 
     /**
@@ -55,7 +77,7 @@ public class LanguageModel {
 	 * @return the generated text
 	 */
 	public String generate(String initialText, int textLength) {
-		// Your code goes here
+		return "";
 	}
 
     /** Returns a string representing the map of this language model. */
@@ -69,6 +91,21 @@ public class LanguageModel {
 	}
 
     public static void main(String[] args) {
-		// Your code goes here
+        LanguageModel languageModel = new LanguageModel(3);
+        List newList = new List();
+        String committee = "committttee_";
+        for (int i = 0; i < committee.length(); i++) {
+            newList.addFirst(committee.charAt(i));
+        }
+        System.out.println(newList);
+        newList = languageModel.calculateProbabilities(newList);
+        System.out.println(newList);
+        int count = 0;
+        int N = 10000;
+        for (int i = 0; i < N; i++) {
+            char c = languageModel.getRandomChar(newList);
+            if (c == 't') count++;
+        }
+        System.out.println((double) count / N);
     }
 }
